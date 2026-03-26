@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - GeoScope</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="topbar">
+        <a class="brand" href="/"><h2>GeoScope</h2></a>
+        <a href="#" data-action="logout">Logout</a>
+    </div>
+
+    <div class="container">
+        <div class="panel">
+            <h2>Admin Panel</h2>
+
+            <div class="kpi-grid" id="adminStageCounters">
+                <div class="kpi-card"><div class="kpi-label">Received</div><div class="kpi-value" id="countReceived">0</div></div>
+                <div class="kpi-card"><div class="kpi-label">GIS Validation</div><div class="kpi-value" id="countGis">0</div></div>
+                <div class="kpi-card"><div class="kpi-label">Analyst Processing</div><div class="kpi-value" id="countAnalyst">0</div></div>
+                <div class="kpi-card"><div class="kpi-label">Report Generated</div><div class="kpi-value" id="countReport">0</div></div>
+                <div class="kpi-card"><div class="kpi-label">Admin Review</div><div class="kpi-value" id="countReview">0</div></div>
+                <div class="kpi-card"><div class="kpi-label">Sent</div><div class="kpi-value" id="countSent">0</div></div>
+            </div>
+
+            <h3>All Orders</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Status</th>
+                        <th>Progress</th>
+                        <th>Assign</th>
+                    </tr>
+                </thead>
+                <tbody id="adminOrdersBody">
+                    <tr>
+                        <td>GEO-101</td>
+                        <td>Pending</td>
+                        <td>Received -> GIS Validation</td>
+                        <td>
+                            <select>
+                                <option>Assign Analyst</option>
+                                <option>John</option>
+                                <option>Mary</option>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

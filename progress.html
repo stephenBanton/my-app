@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoScope – Project Progress</title>
+
+  <!-- React 18 via CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <!-- Babel for JSX in browser -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #161b22 0%, #1c2b3a 100%);
+      border-bottom: 1px solid #30363d;
+      padding: 24px 40px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .header-icon {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, #2ea043, #1a7f37);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+    }
+    .header h1 { font-size: 22px; font-weight: 600; color: #f0f6fc; }
+    .header p  { font-size: 13px; color: #8b949e; margin-top: 2px; }
+    .header-badge {
+      margin-left: auto;
+      background: #1a7f37;
+      color: #3fb950;
+      border: 1px solid #238636;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* ── Layout ── */
+    .page { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+
+    /* ── Section title ── */
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 14px;
+      margin-top: 32px;
+    }
+
+    /* ── Overall progress bar ── */
+    .overall-card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-bottom: 32px;
+    }
+    .overall-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 16px;
+    }
+    .overall-header h2 { font-size: 18px; color: #f0f6fc; }
+    .overall-percent { font-size: 36px; font-weight: 700; color: #3fb950; }
+    .progress-track {
+      height: 12px;
+      background: #21262d;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #238636, #3fb950);
+      transition: width 1s ease;
+    }
+    .progress-labels {
+      display: flex; justify-content: space-between;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #8b949e;
+    }
+
+    /* ── Stats row ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      padding: 20px 24px;
+      text-align: center;
+    }
+    .stat-value { font-size: 28px; font-weight: 700; }
+    .stat-label { font-size: 12px; color: #8b949e; margin-top: 4px; }
+    .green { color: #3fb950; }
+    .blue  { color: #58a6ff; }
+    .orange { color: #e3b341; }
+    .purple { color: #bc8cff; }
+    .red   { color: #f85149; }
+
+    /* ── Two-column grid ── */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* ── Feature card ── */
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .card h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #f0f6fc;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card h3 .tag {
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 2px 7px;
+      font-size: 11px;
+      color: #8b949e;
+      font-weight: 500;
+    }
+
+    /* ── Feature item ── */
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid #21262d;
+      font-size: 13px;
+    }
+    .feature-item:last-child { border-bottom: none; }
+    .status-dot {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 1px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px;
+    }
+    .done  { background: #1a7f37; color: #3fb950; }
+    .wip   { background: #533d0c; color: #e3b341; }
+    .todo  { background: #1c2b3a; color: #58a6ff; border: 1px solid #388bfd; }
+    .feature-text { flex: 1; }
+    .feature-text strong { color: #e6edf3; }
+    .feature-text span   { color: #8b949e; font-size: 12px; }
+
+    /* ── Tech stack ── */
+    .tech-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tech-chip {
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 12px;
+      color: #c9d1d9;
+    }
+    .tech-chip.highlight { border-color: #388bfd; color: #58a6ff; background: #1c2b3a; }
+
+    /* ── File tree ── */
+    .file-tree { font-size: 12px; color: #8b949e; line-height: 2; font-family: monospace; }
+    .file-tree .dir  { color: #58a6ff; }
+    .file-tree .file { color: #3fb950; }
+    .file-tree .test { color: #e3b341; }
+
+    /* ── Timeline ── */
+    .timeline { list-style: none; }
+    .timeline li {
+      display: grid;
+      grid-template-columns: 90px 20px 1fr;
+      gap: 8px;
+      align-items: flex-start;
+      padding: 8px 0;
+      font-size: 13px;
+    }
+    .timeline li .date { color: #8b949e; font-size: 11px; padding-top: 2px; }
+    .timeline-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-top: 5px;
+    }
+    .timeline-dot.green { background: #3fb950; }
+    .timeline-dot.blue  { background: #58a6ff; }
+    .timeline-dot.orange{ background: #e3b341; }
+
+    /* ── Deployment ── */
+    .deploy-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #21262d; font-size: 13px; }
+    .deploy-row:last-child { border-bottom: none; }
+    .deploy-status { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .deploy-status.ready  { background: #1a7f37; color: #3fb950; }
+    .deploy-status.config { background: #533d0c; color: #e3b341; }
+    .deploy-status.pending{ background: #1c2b3a; color: #58a6ff; border: 1px solid #388bfd; }
+
+    /* ── Footer ── */
+    .footer { text-align: center; color: #8b949e; font-size: 12px; padding: 40px 0 20px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    /* ─────────────────────────────────────────────
+       DATA
+    ───────────────────────────────────────────── */
+    const BACKEND_FEATURES = [
+      { status: 'done', name: 'Express server (server.js)', note: 'Ports 5000 & 6000, CORS, body-parser' },
+      { status: 'done', name: 'JWT Authentication (auth.js)', note: 'Login, token sign/verify, role middleware' },
+      { status: 'done', name: 'Orders API (/orders)', note: 'Create, fetch, update order status' },
+      { status: 'done', name: 'Report generation', note: 'Puppeteer PDF + reportTemplate.html' },
+      { status: 'done', name: 'File upload endpoint', note: 'Multer, memory storage, 10 MB limit' },
+      { status: 'done', name: 'Email delivery', note: 'Nodemailer integration' },
+      { status: 'done', name: 'Supabase integration', note: '@supabase/supabase-js v2' },
+      { status: 'done', name: 'MongoDB integration', note: 'Mongoose, GeoData model' },
+      { status: 'done', name: 'SQLite fallback', note: 'better-sqlite3 in-memory fallback' },
+      { status: 'done', name: 'OpenAI integration', note: 'AI-assisted report content' },
+      { status: 'done', name: 'Geo buffer query', note: '@turf/turf 250 m radius analysis' },
+      { status: 'done', name: 'Save-order endpoint', note: 'Analyst save-and-exit workflow' },
+      { status: 'wip',  name: '.env configuration', note: 'Secrets must be set before deploy' },
+      { status: 'todo', name: 'Production hardening', note: 'Rate limiting, helmet, input sanitisation' },
+    ];
+
+    const FRONTEND_FEATURES = [
+      { status: 'done', name: 'index.html – Home page', note: 'Logo, nav, CTA' },
+      { status: 'done', name: 'login.html – Auth form', note: 'JWT login, role-based redirect' },
+      { status: 'done', name: 'dashboard.html – Client workbench', note: 'Orders list, report submit' },
+      { status: 'done', name: 'products.html – Products page', note: '' },
+      { status: 'done', name: 'about.html – About page', note: '' },
+      { status: 'done', name: 'contact.html – Contact page', note: '' },
+      { status: 'done', name: 'style.css – Global theme', note: 'Dark header, responsive layout' },
+      { status: 'done', name: 'script.js – Unified JS', note: 'API fallback (5000/6000), session mgmt' },
+      { status: 'done', name: 'vercel.json – Deploy config', note: 'Static export ready' },
+      { status: 'wip',  name: 'Backend URL for production', note: 'Must swap localhost → deployed URL' },
+      { status: 'todo', name: 'Admin / analyst dashboard', note: 'Role-specific UI pages' },
+    ];
+
+    const TECH_STACK = [
+      { label: 'Express 5', highlight: true },
+      { label: 'Node.js', highlight: true },
+      { label: 'JWT', highlight: false },
+      { label: 'MongoDB / Mongoose', highlight: false },
+      { label: 'Supabase', highlight: true },
+      { label: 'SQLite (better-sqlite3)', highlight: false },
+      { label: 'OpenAI API', highlight: true },
+      { label: '@turf/turf', highlight: false },
+      { label: 'Puppeteer', highlight: false },
+      { label: 'Nodemailer', highlight: false },
+      { label: 'Multer', highlight: false },
+      { label: 'React 18', highlight: true },
+      { label: 'Axios', highlight: false },
+      { label: 'Vercel (frontend)', highlight: true },
+    ];
+
+    const FILES = {
+      backend: [
+        { name: 'server.js', type: 'file' },
+        { name: 'auth.js', type: 'file' },
+        { name: 'reportTemplate.html', type: 'file' },
+        { name: 'server-override.js', type: 'file' },
+        { name: 'package.json', type: 'file' },
+        { name: 'reports/', type: 'dir' },
+        { name: 'test-all-roles.js', type: 'test' },
+        { name: 'test-auth-endpoint.js', type: 'test' },
+        { name: 'test-both-servers.js', type: 'test' },
+        { name: 'test-order.js', type: 'test' },
+        { name: 'test-port-6000.js', type: 'test' },
+        { name: 'test-report.js', type: 'test' },
+        { name: 'verify-auth-system.js', type: 'test' },
+        { name: 'final-check.js', type: 'test' },
+        { name: 'production-readiness-check.js', type: 'test' },
+      ],
+      frontend: [
+        { name: 'index.html', type: 'file' },
+        { name: 'login.html', type: 'file' },
+        { name: 'dashboard.html', type: 'file' },
+        { name: 'products.html', type: 'file' },
+        { name: 'about.html', type: 'file' },
+        { name: 'contact.html', type: 'file' },
+        { name: 'script.js', type: 'file' },
+        { name: 'style.css', type: 'file' },
+        { name: 'vercel.json', type: 'file' },
+        { name: 'README.md', type: 'file' },
+        { name: 'progress.html', type: 'file' },
+      ],
+    };
+
+    const DEPLOY = [
+      { label: 'Frontend (Vercel)', status: 'ready', note: 'vercel.json present, awaiting GitHub push' },
+      { label: 'Static HTML/CSS/JS', status: 'ready', note: 'No build step required' },
+      { label: 'Backend (Node server)', status: 'config', note: '.env secrets needed before deploy' },
+      { label: 'Database (Supabase)', status: 'ready', note: 'Cloud-hosted, SDK configured' },
+      { label: 'MongoDB Atlas', status: 'pending', note: 'Connection string via MONGODB_URI env var' },
+    ];
+
+    /* ─────────────────────────────────────────────
+       HELPERS
+    ───────────────────────────────────────────── */
+    function countDone(arr) { return arr.filter(f => f.status === 'done').length; }
+    function pct(done, total) { return Math.round((done / total) * 100); }
+
+    const StatusDot = ({ status }) => {
+      const map = { done: '✓', wip: '⏳', todo: '○' };
+      return <span className={`status-dot ${status}`}>{map[status]}</span>;
+    };
+
+    const ProgressBar = ({ value }) => (
+      <div className="progress-track">
+        <div className="progress-fill" style={{ width: `${value}%` }} />
+      </div>
+    );
+
+    /* ─────────────────────────────────────────────
+       APP
+    ───────────────────────────────────────────── */
+    function App() {
+      const [animated, setAnimated] = useState(0);
+
+      const beDone  = countDone(BACKEND_FEATURES);
+      const feDone  = countDone(FRONTEND_FEATURES);
+      const beTotal = BACKEND_FEATURES.length;
+      const feTotal = FRONTEND_FEATURES.length;
+      const allDone = beDone + feDone;
+      const allTotal = beTotal + feTotal;
+      const overallPct = pct(allDone, allTotal);
+      const testCount = FILES.backend.filter(f => f.type === 'test').length;
+
+      useEffect(() => {
+        const t = setTimeout(() => setAnimated(overallPct), 100);
+        return () => clearTimeout(t);
+      }, []);
+
+      return (
+        <div>
+          {/* ── Header ── */}
+          <div className="header">
+            <div className="header-icon">🌍</div>
+            <div>
+              <h1>GeoScope Solutions</h1>
+              <p>Full-stack geospatial platform — project progress dashboard</p>
+            </div>
+            <div className="header-badge">🟢 Active Development</div>
+          </div>
+
+          <div className="page">
+
+            {/* ── Overall progress ── */}
+            <div className="overall-card">
+              <div className="overall-header">
+                <div>
+                  <h2>Overall Completion</h2>
+                  <p style={{ color: '#8b949e', fontSize: 13, marginTop: 4 }}>
+                    {allDone} of {allTotal} features shipped
+                  </p>
+                </div>
+                <div className="overall-percent">{overallPct}%</div>
+              </div>
+              <ProgressBar value={animated} />
+              <div className="progress-labels">
+                <span>0%</span>
+                <span>Backend {pct(beDone, beTotal)}% · Frontend {pct(feDone, feTotal)}%</span>
+                <span>100%</span>
+              </div>
+            </div>
+
+            {/* ── Stats ── */}
+            <div className="stats-row">
+              <div className="stat-card">
+                <div className="stat-value green">{beDone}</div>
+                <div className="stat-label">Backend features done</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-value blue">{feDone}</div>
+                <div className="stat-label">Frontend pages/features done</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-value orange">{testCount}</div>
+                <div className="stat-label">Test &amp; verify scripts</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-value purple">14</div>
+                <div className="stat-label">npm dependencies</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-value red">
+                  {[...BACKEND_FEATURES,...FRONTEND_FEATURES].filter(f=>f.status==='wip').length}
+                </div>
+                <div className="stat-label">In progress</div>
+              </div>
+            </div>
+
+            {/* ── Backend + Frontend features ── */}
+            <p className="section-title">Feature Breakdown</p>
+            <div className="grid-2">
+              {/* Backend */}
+              <div className="card">
+                <h3>⚙️ Backend <span className="tag">geoscope/</span>
+                  <span style={{marginLeft:'auto',color:'#3fb950',fontSize:12}}>{pct(beDone,beTotal)}%</span>
+                </h3>
+                <ProgressBar value={pct(beDone, beTotal)} />
+                <div style={{marginTop:12}}>
+                  {BACKEND_FEATURES.map((f, i) => (
+                    <div key={i} className="feature-item">
+                      <StatusDot status={f.status} />
+                      <div className="feature-text">
+                        <strong>{f.name}</strong>
+                        {f.note && <><br /><span>{f.note}</span></>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Frontend */}
+              <div className="card">
+                <h3>🖥️ Frontend <span className="tag">geoscope-workbench/</span>
+                  <span style={{marginLeft:'auto',color:'#58a6ff',fontSize:12}}>{pct(feDone,feTotal)}%</span>
+                </h3>
+                <ProgressBar value={pct(feDone, feTotal)} />
+                <div style={{marginTop:12}}>
+                  {FRONTEND_FEATURES.map((f, i) => (
+                    <div key={i} className="feature-item">
+                      <StatusDot status={f.status} />
+                      <div className="feature-text">
+                        <strong>{f.name}</strong>
+                        {f.note && <><br /><span>{f.note}</span></>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* ── Tech stack + file tree ── */}
+            <p className="section-title">Tech Stack &amp; Files</p>
+            <div className="grid-2">
+              <div className="card">
+                <h3>🧰 Tech Stack</h3>
+                <div className="tech-grid">
+                  {TECH_STACK.map((t, i) => (
+                    <span key={i} className={`tech-chip${t.highlight ? ' highlight' : ''}`}>{t.label}</span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="card">
+                <h3>📁 File Tree</h3>
+                <div className="file-tree">
+                  <div className="dir">geoscope/ (backend)</div>
+                  {FILES.backend.map((f, i) => (
+                    <div key={i} style={{paddingLeft:16}} className={f.type}>
+                      &nbsp;{'├─'} {f.name}
+                    </div>
+                  ))}
+                  <div style={{marginTop:8}} className="dir">geoscope-workbench/ (frontend)</div>
+                  {FILES.frontend.map((f, i) => (
+                    <div key={i} style={{paddingLeft:16}} className={f.type}>
+                      &nbsp;{'├─'} {f.name}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* ── Deployment ── */}
+            <p className="section-title">Deployment Status</p>
+            <div className="card" style={{marginBottom:32}}>
+              <h3>🚀 Deploy Readiness</h3>
+              {DEPLOY.map((d, i) => (
+                <div key={i} className="deploy-row">
+                  <span className={`deploy-status ${d.status}`}>
+                    {d.status === 'ready' ? '✓ Ready' : d.status === 'config' ? '⚙ Config needed' : '○ Pending'}
+                  </span>
+                  <strong style={{color:'#e6edf3'}}>{d.label}</strong>
+                  <span style={{color:'#8b949e', fontSize:12}}>{d.note}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* ── Next steps ── */}
+            <p className="section-title">Next Steps</p>
+            <div className="card" style={{marginBottom:16}}>
+              <h3>📋 Recommended Next Actions</h3>
+              {[
+                { icon: '1️⃣', text: 'Set all .env variables (SUPABASE_URL, MONGODB_URI, OPENAI_API_KEY, JWT_SECRET, email creds)' },
+                { icon: '2️⃣', text: 'Push geoscope-workbench to GitHub and import to Vercel (see README.md)' },
+                { icon: '3️⃣', text: 'Deploy backend to Railway, Render, or a VPS — update script.js with the live URL' },
+                { icon: '4️⃣', text: 'Build admin/analyst dashboard page (role-based views)' },
+                { icon: '5️⃣', text: 'Add rate-limiting, helmet.js, and input sanitisation for production hardening' },
+              ].map((s, i) => (
+                <div key={i} className="feature-item">
+                  <span style={{fontSize:18, lineHeight:1.3}}>{s.icon}</span>
+                  <div className="feature-text"><span>{s.text}</span></div>
+                </div>
+              ))}
+            </div>
+
+            <div className="footer">
+              GeoScope Solutions &copy; 2026 &nbsp;·&nbsp; Generated {new Date().toLocaleDateString()}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Client Dashboard - GeoScope</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="topbar">
+        <a class="brand" href="/"><h2>GeoScope</h2></a>
+        <div>
+            <a href="/request-report">Request Report</a>
+            <a href="#" data-action="logout">Logout</a>
+        </div>
+    </div>
+
+    <div class="container grid">
+        <div class="panel">
+            <h2>My Dashboard</h2>
+            <p>Signed in as <strong id="clientEmail">client</strong></p>
+            <button onclick="window.location.href='/request-report'">+ Request New Report</button>
+        </div>
+
+        <div class="panel">
+            <h3>My Orders</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Status</th>
+                        <th>Progress</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="clientOrdersBody">
+                    <tr>
+                        <td>GEO-001</td>
+                        <td>Processing</td>
+                        <td>Received -> GIS Validation -> Analyst Processing</td>
+                        <td><button disabled>View</button></td>
+                    </tr>
+                    <tr>
+                        <td>GEO-002</td>
+                        <td>Completed</td>
+                        <td>Received -> GIS Validation -> Analyst Processing -> Report Generated -> Admin Review -> Sent</td>
+                        <td><button disabled>Download</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

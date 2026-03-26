@@ -1,0 +1,38 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/client-login",
+      "destination": "/client-login.html"
+    },
+    {
+      "source": "/staff-login",
+      "destination": "/staff-login.html"
+    },
+    {
+      "source": "/client-dashboard",
+      "destination": "/client-dashboard.html"
+    },
+    {
+      "source": "/workbench",
+      "destination": "/workbench.html"
+    },
+    {
+      "source": "/admin-dashboard",
+      "destination": "/admin-dashboard.html"
+    },
+    {
+      "source": "/request-report",
+      "destination": "/request-report.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/staff-login.html"
+    },
+    {
+      "source": "/",
+      "destination": "/index.html"
+    }
+  ]
+}

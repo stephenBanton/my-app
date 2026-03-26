@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Request Report - GeoScope</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="topbar">
+        <a class="brand" href="/"><h2>GeoScope</h2></a>
+        <div>
+            <a href="/client-dashboard">My Dashboard</a>
+            <a href="#" data-action="logout">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="panel" style="max-width: 620px;">
+            <h2>Request New Report</h2>
+            <input id="projectName" placeholder="Project name" />
+            <input id="address" placeholder="Address" />
+            <div class="grid" style="grid-template-columns: 1fr 1fr;">
+                <input id="latitude" type="number" step="any" placeholder="Latitude" />
+                <input id="longitude" type="number" step="any" placeholder="Longitude" />
+            </div>
+            <button id="requestSubmitBtn">Submit Request</button>
+            <p id="requestStatus" class="message"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
